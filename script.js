@@ -19,6 +19,20 @@ if (navigator.geolocation)
       console.log(
         `https://www.google.com/maps/place/Jollibee+Tanay+Highway/@{latitude},{longitude}/data=!4m6!3m5!1s0x3397ebf7ea82a5d9:0xd7f19b614a82f970!8m2!3d14.500689!4d121.295322!16s%2Fg%2F12qg73zd0?entry=ttu&g_ep=EgoyMDI1MDMwNC4wIKXMDSoASAFQAw%3D%3D`
       );
+
+      const coords = [latitude, longitude];
+
+      const map = L.map('map').setView(coords, 15);
+
+      L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        attribution:
+          '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+      }).addTo(map);
+
+      L.marker(coords)
+        .addTo(map)
+        .bindPopup('A pretty CSS popup.<br> Easily customizable.')
+        .openPopup();
     },
     function () {
       alert('Could not get your position');
