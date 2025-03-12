@@ -11,18 +11,17 @@ const inputDuration = document.querySelector('.form__input--duration');
 const inputCadence = document.querySelector('.form__input--cadence');
 const inputElevation = document.querySelector('.form__input--elevation');
 
+let map, mapEvent;
+
 if (navigator.geolocation)
   navigator.geolocation.getCurrentPosition(
     function (position) {
       const { latitude } = position.coords;
       const { longitude } = position.coords;
-      console.log(
-        `https://www.google.com/maps/place/Jollibee+Tanay+Highway/@{latitude},{longitude}/data=!4m6!3m5!1s0x3397ebf7ea82a5d9:0xd7f19b614a82f970!8m2!3d14.500689!4d121.295322!16s%2Fg%2F12qg73zd0?entry=ttu&g_ep=EgoyMDI1MDMwNC4wIKXMDSoASAFQAw%3D%3D`
-      );
 
       const coords = [latitude, longitude];
 
-      const map = L.map('map').setView(coords, 15);
+      map = L.map('map').setView(coords, 15);
       // console.log(map);
 
       L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -30,27 +29,48 @@ if (navigator.geolocation)
           '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
       }).addTo(map);
 
-      map.on('click', function (mapEvent) {
-        console.log(mapEvent);
-
-        const { lat, lng } = mapEvent.latlng;
-
-        L.marker([lat, lng])
-          .addTo(map)
-          .bindPopup(
-            L.popup({
-              maxWidth: 250,
-              minWidth: 100,
-              autoClose: false,
-              closeOnClick: false,
-              className: 'running-popup',
-            })
-          )
-          .setPopupContent('Workout')
-          .openPopup();
+      // Handling clicks on map
+      map.on('click', function (mapE) {
+        mapEvent = mapE;
+        form.classList.remove('hidden');
+        inputDistance.focus();
       });
     },
     function () {
       alert('Could not get your position');
     }
   );
+
+form.addEventListener('submit', function (e) {
+  e.preventDefault();
+
+  // Clear input fields
+  inputDistance.value =
+    inputDuration.value =
+    inputCadence.value =
+    inputElevation.value =
+      '';
+
+  // Display the Marker
+  // console.log(mapEvent);
+  const { lat, lng } = mapEvent.latlng;
+
+  L.marker([lat, lng])
+    .addTo(map)
+    .bindPopup(
+      L.popup({
+        maxWidth: 250,
+        minWidth: 100,
+        autoClose: false,
+        closeOnClick: false,
+        className: 'running-popup',
+      })
+    )
+    .setPopupContent('Workout')
+    .openPopup();
+});
+
+inputType.addEventListener('change', function () {
+  inputElevation.closest('.form__row').classList.toggle('form__row--hidden');
+  inputCadence.closest('.form__row').classList.toggle('form__row--hidden');
+});
